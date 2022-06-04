@@ -1,0 +1,17 @@
+FROM --platform=linux/amd64 ubuntu:22.04
+
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim less file locate && echo 'alias locate="updatedb && locate"' >> ~/.bashrc
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-is-python3 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
+RUN pip3 install certifi
+RUN pip3 install distro
+
+COPY . /repo
+WORKDIR /repo
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git
+RUN python3 ./tools/packaging/cpt.py --check-requirements < /repo/stdin
+RUN python3 ./tools/packaging/cpt.py --create-dev-env Debug --with-workdir=./cling-build/
+
